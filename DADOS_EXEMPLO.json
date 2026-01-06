@@ -1,0 +1,176 @@
+{
+  "pedidos_exemplo": [
+    {
+      "id": "SAV12345678",
+      "nome": "Maria Silva",
+      "telefone": "(11) 98765-4321",
+      "endereco": "Rua das Flores, 123 - Centro",
+      "observacoes": "Entregar após às 18h",
+      "items": [
+        {
+          "id": 1700000001,
+          "tamanho": "mini",
+          "nome": "Mini Bolo Vulcão",
+          "precoUnitario": 14,
+          "quantidade": 2,
+          "massa": "chocolate",
+          "cobertura": "ganache",
+          "acompanhamento": "sorvete",
+          "coberturaExtra": true,
+          "total": 28
+        }
+      ],
+      "total": 28,
+      "data": "2024-01-15T10:30:00.000Z",
+      "status": "confirmado"
+    },
+    {
+      "id": "SAV12345679",
+      "nome": "João Santos",
+      "telefone": "(11) 91234-5678",
+      "endereco": "Av. Paulista, 1000 - Bela Vista",
+      "observacoes": "",
+      "items": [
+        {
+          "id": 1700000002,
+          "tamanho": "medio",
+          "nome": "Bolinho Vulcão",
+          "precoUnitario": 25,
+          "quantidade": 1,
+          "massa": "red-velvet",
+          "cobertura": "brigadeiro",
+          "acompanhamento": "chantilly",
+          "coberturaExtra": false,
+          "total": 25
+        }
+      ],
+      "total": 25,
+      "data": "2024-01-15T11:45:00.000Z",
+      "status": "preparando"
+    },
+    {
+      "id": "SAV12345680",
+      "nome": "Ana Oliveira",
+      "telefone": "(11) 99876-5432",
+      "endereco": "Rua Augusta, 500 - Consolação",
+      "observacoes": "Aniversário, por favor capriche!",
+      "items": [
+        {
+          "id": 1700000003,
+          "tamanho": "grande",
+          "nome": "Bolo Vulcão Grande",
+          "precoUnitario": 52,
+          "quantidade": 1,
+          "massa": "baunilha",
+          "cobertura": "nutella",
+          "acompanhamento": "frutas",
+          "coberturaExtra": true,
+          "total": 52
+        },
+        {
+          "id": 1700000004,
+          "tamanho": "mini",
+          "nome": "Mini Bolo Vulcão",
+          "precoUnitario": 12,
+          "quantidade": 3,
+          "massa": "limao",
+          "cobertura": "morango",
+          "acompanhamento": "sem-acompanhamento",
+          "coberturaExtra": false,
+          "total": 36
+        }
+      ],
+      "total": 88,
+      "data": "2024-01-15T14:20:00.000Z",
+      "status": "pronto"
+    },
+    {
+      "id": "SAV12345681",
+      "nome": "Carlos Mendes",
+      "telefone": "(11) 94567-8901",
+      "endereco": "Rua Oscar Freire, 200 - Jardins",
+      "observacoes": "",
+      "items": [
+        {
+          "id": 1700000005,
+          "tamanho": "mini",
+          "nome": "Mini Bolo Vulcão",
+          "precoUnitario": 12,
+          "quantidade": 5,
+          "massa": "cenoura",
+          "cobertura": "doce-leite",
+          "acompanhamento": "calda-chocolate",
+          "coberturaExtra": false,
+          "total": 60
+        }
+      ],
+      "total": 60,
+      "data": "2024-01-15T16:00:00.000Z",
+      "status": "entregue"
+    },
+    {
+      "id": "SAV12345682",
+      "nome": "Patricia Costa",
+      "telefone": "(11) 93456-7890",
+      "endereco": "Alameda Santos, 700 - Jardim Paulista",
+      "observacoes": "Sem glúten se possível",
+      "items": [
+        {
+          "id": 1700000006,
+          "tamanho": "medio",
+          "nome": "Bolinho Vulcão",
+          "precoUnitario": 27,
+          "quantidade": 2,
+          "massa": "chocolate",
+          "cobertura": "ganache",
+          "acompanhamento": "sorvete",
+          "coberturaExtra": true,
+          "total": 54
+        }
+      ],
+      "total": 54,
+      "data": "2024-01-15T17:30:00.000Z",
+      "status": "recebido"
+    }
+  ],
+  "instrucoes": {
+    "como_usar": "Para importar estes dados de exemplo:",
+    "passos": [
+      "1. Abra o Console do navegador (F12)",
+      "2. Copie e execute o seguinte código:",
+      "localStorage.setItem('saboravidaOrders', JSON.stringify([...cole_aqui_o_array_de_pedidos...]))",
+      "3. Recarregue a página",
+      "4. Os pedidos aparecerão no painel admin"
+    ],
+    "alternativa": "Ou simplesmente faça pedidos pela interface do cliente para testar o sistema completo"
+  },
+  "sabores_populares": {
+    "massas": [
+      "chocolate",
+      "baunilha",
+      "red-velvet",
+      "limao",
+      "cenoura"
+    ],
+    "coberturas": [
+      "ganache",
+      "brigadeiro",
+      "morango",
+      "doce-leite",
+      "nutella"
+    ],
+    "acompanhamentos": [
+      "sorvete",
+      "chantilly",
+      "frutas",
+      "calda-chocolate",
+      "sem-acompanhamento"
+    ]
+  },
+  "precos": {
+    "mini_bolo_10cm": 12.00,
+    "bolinho_14cm": 25.00,
+    "bolo_grande_18cm": 50.00,
+    "cobertura_extra": 2.00
+  }
+}

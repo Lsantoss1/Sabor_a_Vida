@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Sabor à Vida</title>
+
+    <link rel="icon" href="img/logo_g.png" type="image/png" />
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+    />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+    <link rel="stylesheet" href="css/admin.css" />
+  </head>
+  <body class="admin-body">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+      <div class="login-container">
+        <div class="login-card">
+          <div class="login-header">
+            <i class="fas fa-user-shield"></i>
+            <h2>Painel Administrativo</h2>
+            <p>Sabor à Vida</p>
+          </div>
+          <form id="loginForm" class="login-form">
+            <div class="form-group">
+              <label><i class="fas fa-user"></i> Usuário</label>
+              <input
+                type="text"
+                id="username"
+                required
+                placeholder="Digite seu usuário"
+              />
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-lock"></i> Senha</label>
+              <input
+                type="password"
+                id="password"
+                required
+                placeholder="Digite sua senha"
+              />
+            </div>
+            <button type="submit" class="btn btn-primary btn-large">
+              <i class="fas fa-sign-in-alt"></i> Entrar
+            </button>
+            <p class="login-hint">Usuário: admin | Senha: sabor123</p>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="admin-dashboard" style="display: none">
+      <!-- Sidebar -->
+      <aside class="admin-sidebar">
+        <div class="sidebar-header">
+          <i class="fas fa-birthday-cake"></i>
+          <h3>Sabor à Vida</h3>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="#" class="nav-item active" data-view="dashboard">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="#" class="nav-item" data-view="pedidos">
+            <i class="fas fa-shopping-bag"></i>
+            <span>Pedidos</span>
+            <span class="badge" id="pedidosBadge">0</span>
+          </a>
+          <a href="#" class="nav-item" data-view="financeiro">
+            <i class="fas fa-dollar-sign"></i>
+            <span>Financeiro</span>
+          </a>
+          <a href="#" class="nav-item" data-view="produtos">
+            <i class="fas fa-cake-candles"></i>
+            <span>Produtos</span>
+          </a>
+          <a href="#" class="nav-item" data-view="configuracoes">
+            <i class="fas fa-cog"></i>
+            <span>Configurações</span>
+          </a>
+        </nav>
+        <div class="sidebar-footer">
+          <button class="btn btn-secondary" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Sair
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="admin-main">
+        <!-- Header -->
+        <header class="admin-header">
+          <h1 id="pageTitle">Dashboard</h1>
+          <div class="admin-actions">
+            <button class="btn btn-icon" onclick="refreshData()">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+            <div class="admin-user">
+              <i class="fas fa-user-circle"></i>
+              <span>Admin</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- Dashboard View -->
+        <div id="dashboardView" class="admin-view active">
+          <!-- Stats Cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div
+                class="stat-icon"
+                style="
+                  background: linear-gradient(135deg, #ff6b9d 0%, #ffc371 100%);
+                "
+              >
+                <i class="fas fa-dollar-sign"></i>
+              </div>
+              <div class="stat-content">
+                <h3 id="totalVendas">R$ 0,00</h3>
+                <p>Total de Vendas</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div
+                class="stat-icon"
+                style="
+                  background: linear-gradient(135deg, #a05cff 0%, #ff6b9d 100%);
+                "
+              >
+                <i class="fas fa-shopping-cart"></i>
+              </div>
+              <div class="stat-content">
+                <h3 id="totalPedidos">0</h3>
+                <p>Total de Pedidos</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div
+                class="stat-icon"
+                style="
+                  background: linear-gradient(135deg, #6bcf7f 0%, #4caf50 100%);
+                "
+              >
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="stat-content">
+                <h3 id="pedidosHoje">0</h3>
+                <p>Pedidos Hoje</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div
+                class="stat-icon"
+                style="
+                  background: linear-gradient(135deg, #ffd93d 0%, #ff9800 100%);
+                "
+              >
+                <i class="fas fa-star"></i>
+              </div>
+              <div class="stat-content">
+                <h3 id="ticketMedio">R$ 0,00</h3>
+                <p>Ticket Médio</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="charts-grid">
+            <div class="chart-card">
+              <h3>Vendas por Período</h3>
+              <canvas id="salesChart" style="height: 300px"></canvas>
+            </div>
+            <div class="chart-card">
+              <h3>Produtos Mais Vendidos</h3>
+              <canvas id="productsChart" style="height: 300px"></canvas>
+            </div>
+          </div>
+
+          <!-- Recent Orders -->
+          <div class="recent-orders">
+            <h3>Pedidos Recentes</h3>
+            <div id="recentOrdersList"></div>
+          </div>
+        </div>
+
+        <!-- Pedidos View -->
+        <div id="pedidosView" class="admin-view">
+          <div class="view-header">
+            <div class="filter-tabs">
+              <button
+                class="filter-tab active"
+                data-status="todos"
+                onclick="filterOrders('todos')"
+              >
+                Todos
+              </button>
+              <button
+                class="filter-tab"
+                data-status="pendente"
+                onclick="filterOrders('pendente')"
+              >
+                Pendentes
+              </button>
+              <button
+                class="filter-tab"
+                data-status="confirmado"
+                onclick="filterOrders('confirmado')"
+              >
+                Confirmados
+              </button>
+              <button
+                class="filter-tab"
+                data-status="preparando"
+                onclick="filterOrders('preparando')"
+              >
+                Em Preparação
+              </button>
+              <button
+                class="filter-tab"
+                data-status="pronto"
+                onclick="filterOrders('pronto')"
+              >
+                Prontos
+              </button>
+              <button
+                class="filter-tab"
+                data-status="entregue"
+                onclick="filterOrders('entregue')"
+              >
+                Entregues
+              </button>
+            </div>
+          </div>
+
+          <div id="pedidosList" class="pedidos-list"></div>
+        </div>
+
+        <!-- Financeiro View -->
+        <div id="financeiroView" class="admin-view">
+          <div class="financial-summary">
+            <div class="financial-card">
+              <h3>Faturamento Mensal</h3>
+              <p class="financial-value" id="faturamentoMensal">R$ 0,00</p>
+              <span class="financial-change positive">
+                <i class="fas fa-arrow-up"></i> 12.5%
+              </span>
+            </div>
+            <div class="financial-card">
+              <h3>Faturamento Semanal</h3>
+              <p class="financial-value" id="faturamentoSemanal">R$ 0,00</p>
+              <span class="financial-change positive">
+                <i class="fas fa-arrow-up"></i> 8.3%
+              </span>
+            </div>
+            <div class="financial-card">
+              <h3>Faturamento Hoje</h3>
+              <p class="financial-value" id="faturamentoHoje">R$ 0,00</p>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h3>Evolução Financeira</h3>
+            <canvas id="financialChart" style="height: 400px"></canvas>
+          </div>
+
+          <div class="transactions-list">
+            <h3>Histórico de Transações</h3>
+            <div id="transactionsList"></div>
+          </div>
+        </div>
+
+        <!-- Produtos View -->
+        <div id="produtosView" class="admin-view">
+          <div class="products-stats">
+            <div class="product-stat-card">
+              <i class="fas fa-cupcake"></i>
+              <div>
+                <h4 id="miniBolosCount">0</h4>
+                <p>Mini Bolos Vendidos</p>
+              </div>
+            </div>
+            <div class="product-stat-card">
+              <i class="fas fa-cake-candles"></i>
+              <div>
+                <h4 id="bolinhoCount">0</h4>
+                <p>Bolinhos Vendidos</p>
+              </div>
+            </div>
+            <div class="product-stat-card">
+              <i class="fas fa-birthday-cake"></i>
+              <div>
+                <h4 id="boloGrandeCount">0</h4>
+                <p>Bolos Grandes Vendidos</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h3>Sabores Mais Populares</h3>
+            <div id="flavorsChart"></div>
+          </div>
+        </div>
+
+        <!-- Configurações View -->
+        <div id="configuracoesView" class="admin-view">
+          <div class="settings-section">
+            <h3>Configurações da Loja</h3>
+            <div class="settings-form">
+              <div class="form-group">
+                <label>Número do WhatsApp</label>
+                <input
+                  type="tel"
+                  value="(00) 00000-0000"
+                  placeholder="(00) 00000-0000"
+                />
+              </div>
+              <div class="form-group">
+                <label>Horário de Funcionamento</label>
+                <input
+                  type="text"
+                  value="Segunda a Sábado: 8h às 20h"
+                  placeholder="Horário"
+                />
+              </div>
+              <div class="form-group">
+                <label>Taxa de Entrega</label>
+                <input
+                  type="number"
+                  value="0"
+                  placeholder="R$ 0,00"
+                  step="0.01"
+                />
+              </div>
+              <button class="btn btn-primary">
+                <i class="fas fa-save"></i> Salvar Configurações
+              </button>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>Gerenciar Dados</h3>
+            <div class="danger-zone">
+              <button class="btn btn-secondary" onclick="exportData()">
+                <i class="fas fa-download"></i> Exportar Dados
+              </button>
+              <button class="btn btn-danger" onclick="clearAllOrders()">
+                <i class="fas fa-trash"></i> Limpar Todos os Pedidos
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div id="orderDetailModal" class="modal">
+      <div class="modal-content modal-large">
+        <button class="modal-close" onclick="closeOrderModal()">
+          <i class="fas fa-times"></i>
+        </button>
+        <div id="orderDetailContent"></div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/firebase.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/admin.js"></script>
+  </body>
+</html>

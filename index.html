@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sabor à Vida - Bolos Vulcão Artesanais 🍰</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="icon" href="img/logo_g.png" type="image/png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+    />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+  </head>
+
+  <body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+      <div class="loading-content">
+        <div class="cake-loader">
+          <i class="fas fa-birthday-cake"></i>
+        </div>
+        <h2>Sabor à Vida</h2>
+        <p>Preparando experiências deliciosas...</p>
+      </div>
+    </div>
+
+    <!-- Christmas overlay removido -->
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">
+          <i class="fas fa-birthday-cake"></i>
+          <span class="logo-text">Sabor à Vida</span>
+        </div>
+
+        <ul class="nav-menu" id="navMenu">
+          <li>
+            <a href="#home" class="nav-link active" data-section="home">
+              <i class="fas fa-home"></i> Início
+            </a>
+          </li>
+          <li>
+            <a href="produtos.html" class="nav-link">
+              <i class="fas fa-cake-candles"></i> Produtos
+            </a>
+          </li>
+          <li>
+            <a href="#sobre" class="nav-link" data-section="sobre">
+              <i class="fas fa-heart"></i> Sobre
+            </a>
+          </li>
+          <li>
+            <a
+              href="#rastreamento"
+              class="nav-link"
+              data-section="rastreamento"
+            >
+              <i class="fas fa-map-marked-alt"></i> Rastrear Pedido
+            </a>
+          </li>
+          <li>
+            <a
+              href="produtos.html#carrinho"
+              class="nav-link cart-link"
+              data-section="carrinho"
+            >
+              <i class="fas fa-shopping-cart"></i>
+              <span class="cart-badge" id="cartBadge">0</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Carrinho removido do index (agora em produtos.html) -->
+    <section id="home" class="hero-section">
+      <div class="hero-bg-animation"></div>
+      <div class="hero-container">
+        <div class="hero-content fade-in-up">
+          <span class="hero-badge">🍰 Bolos Vulcão Artesanais</span>
+          <h1 class="hero-title">
+            Exploda de <span class="gradient-text">Sabor</span>
+          </h1>
+          <p class="hero-subtitle">
+            Experimente nossos exclusivos bolos vulcão com recheios cremosos que
+            derretem na boca. Personalize do seu jeito e receba no conforto da
+            sua casa!
+          </p>
+          <div class="hero-buttons">
+            <button
+              class="btn btn-primary btn-pulse"
+              onclick="window.location.href='produtos.html'"
+            >
+              <i class="fas fa-shopping-bag"></i> Ver Produtos
+            </button>
+            <button
+              class="btn btn-secondary"
+              onclick="scrollToSection('sobre')"
+            >
+              <i class="fas fa-info-circle"></i> Saiba Mais
+            </button>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-item">
+              <i class="fas fa-star"></i>
+              <div>
+                <strong>4.9/5</strong>
+                <span>Avaliação</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <i class="fas fa-clock"></i>
+              <div>
+                <strong>30 min</strong>
+                <span>Entrega</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-image fade-in-up delay-1">
+          <div class="hero-cake-card">
+            <div class="cake-image-placeholder">
+              <img src="img/logo_g.png" alt="Sabor à Vida" class="cake-logo" />
+            </div>
+            <div class="floating-elements">
+              <div class="float-icon float-1"><i class="fas fa-heart"></i></div>
+              <div class="float-icon float-2"><i class="fas fa-fire"></i></div>
+              <div class="float-icon float-3"><i class="fas fa-star"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="scroll-indicator">
+        <i class="fas fa-chevron-down"></i>
+      </div>
+    </section>
+
+    <!-- Produtos removidos daqui (página dedicada produtos.html) -->
+
+    <!-- Sobre Section -->
+    <section id="sobre" class="sobre-section">
+      <div class="container">
+        <div class="sobre-grid">
+          <div class="sobre-content fade-in-up">
+            <span class="section-badge">Nossa História</span>
+            <h2 class="section-title">
+              Feito com <span class="gradient-text">Amor</span>
+            </h2>
+            <p class="sobre-text">
+              Na <strong>Sabor à Vida</strong>, acreditamos que cada bolo conta
+              uma história. Nossos bolos vulcão são feitos artesanalmente, com
+              ingredientes selecionados e muito carinho em cada detalhe.
+            </p>
+            <p class="sobre-text">
+              O recheio cremoso que "explode" ao cortar é nossa marca
+              registrada, proporcionando uma experiência única e inesquecível
+              para você e sua família.
+            </p>
+            <div class="sobre-features">
+              <div class="feature-item">
+                <i class="fas fa-check-circle"></i>
+                <span>Ingredientes Premium</span>
+              </div>
+              <div class="feature-item">
+                <i class="fas fa-check-circle"></i>
+                <span>Feito no Dia</span>
+              </div>
+              <div class="feature-item">
+                <i class="fas fa-check-circle"></i>
+                <span>Entrega Rápida</span>
+              </div>
+              <div class="feature-item">
+                <i class="fas fa-check-circle"></i>
+                <span>Personalização Total</span>
+              </div>
+            </div>
+          </div>
+          <div class="sobre-image fade-in-up delay-1">
+            <div class="image-stack">
+              <div class="stack-card card-1">
+                <i class="fas fa-award"></i>
+                <span>Qualidade Garantida</span>
+              </div>
+              <div class="stack-card card-2">
+                <i class="fas fa-heart"></i>
+                <span>Feito com Amor</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rastreamento Section -->
+    <section id="rastreamento" class="rastreamento-section">
+      <div class="container">
+        <div class="section-header fade-in-up">
+          <span class="section-badge">Acompanhe</span>
+          <h2 class="section-title">
+            Rastreie Seu <span class="gradient-text">Pedido</span>
+          </h2>
+          <p class="section-subtitle">
+            Digite seu telefone para acompanhar seu pedido em tempo real
+          </p>
+        </div>
+
+        <div class="rastreamento-card fade-in-up">
+          <div class="track-input-group">
+            <i class="fas fa-phone"></i>
+            <input
+              type="tel"
+              id="trackPhone"
+              placeholder="(00) 00000-0000"
+              maxlength="15"
+              class="track-input"
+            />
+            <button class="btn btn-primary" onclick="trackOrder()">
+              <i class="fas fa-search"></i> Rastrear
+            </button>
+          </div>
+
+          <div id="trackResult" class="track-result" style="display: none">
+            <!-- Resultado será inserido aqui -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal de Personalização -->
+    <div id="customizationModal" class="modal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeCustomizationModal()">
+          <i class="fas fa-times"></i>
+        </button>
+
+        <div class="modal-header">
+          <h2 id="modalTitle">Personalize Seu Bolo</h2>
+          <p id="modalSubtitle">Escolha os sabores perfeitos para você</p>
+        </div>
+
+        <div class="modal-body">
+          <!-- Sabor da Massa -->
+          <div class="custom-group">
+            <label class="custom-label">
+              <i class="fas fa-birthday-cake"></i> Sabor da Massa
+            </label>
+            <div class="custom-options" id="massaOptions">
+              <button class="custom-option" data-value="chocolate">
+                <span class="option-icon">🍫</span>
+                <span>Massa de Chocolate</span>
+              </button>
+              <button class="custom-option" data-value="ovos-amanteigada">
+                <span class="option-icon">🥚</span>
+                <span>Massa de Ovos Amanteigada</span>
+              </button>
+              <button class="custom-option" data-value="cenoura">
+                <span class="option-icon">🥕</span>
+                <span>Massa de Cenoura</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cobertura -->
+          <div class="custom-group">
+            <label class="custom-label">
+              <i class="fas fa-ice-cream"></i> Cobertura
+            </label>
+            <div class="custom-options" id="coberturaOptions">
+              <button class="custom-option" data-value="chocolate">
+                <span class="option-icon">🍫</span>
+                <span>Chocolate</span>
+              </button>
+              <button class="custom-option" data-value="castanha">
+                <img
+                  class="option-icon"
+                  src="icons/castanha.png"
+                  alt="Castanha"
+                />
+                <span>Castanha</span>
+              </button>
+              <button class="custom-option" data-value="ninho">
+                <span class="option-icon">🥛</span>
+                <span>Ninho</span>
+              </button>
+              <button class="custom-option" data-value="pacoca">
+                <img class="option-icon" src="icons/pacoca.png" alt="Paçoca" />
+                <span>Paçoca</span>
+              </button>
+              <button class="custom-option" data-value="doce-leite">
+                <img
+                  class="option-icon"
+                  src="icons/doce-de-leite.png"
+                  alt="Doce de Leite"
+                />
+                <span>Doce de Leite</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Acompanhamento -->
+          <div class="custom-group">
+            <label class="custom-label">
+              <i class="fas fa-cookie-bite"></i> Acompanhamento
+            </label>
+            <div class="custom-options" id="acompanhamentoOptions">
+              <button class="custom-option" data-value="granulado">
+                <img
+                  class="option-icon"
+                  src="icons/granulado-favicon.png"
+                  alt="Granulado"
+                />
+                <span>Granulado</span>
+              </button>
+              <button class="custom-option" data-value="gotas-chocolate">
+                <img
+                  class="option-icon"
+                  src="icons/biscoito.png"
+                  alt="Gotas de Chocolate"
+                />
+                <span>Gotas de Chocolate</span>
+              </button>
+              <button class="custom-option" data-value="castanha">
+                <span class="option-icon">🌰</span>
+                <span>Castanha</span>
+              </button>
+              <button class="custom-option" data-value="amendoim">
+                <span class="option-icon">🥜</span>
+                <span>Amendoim</span>
+              </button>
+              <button class="custom-option" data-value="pacoca">
+                <img class="option-icon" src="icons/pacoca.png" alt="Paçoca" />
+                <span>Paçoca</span>
+              </button>
+              <button class="custom-option" data-value="sem-acompanhamento">
+                <span class="option-icon">❌</span>
+                <span>Sem Acompanhamento</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cobertura Extra -->
+          <div class="custom-group">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="coberturaExtra" />
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-label">
+                <i class="fas fa-plus-circle"></i> Cobertura Extra
+                <span class="extra-preco">+R$ 2,00</span>
+              </span>
+            </label>
+          </div>
+
+          <!-- Quantidade -->
+          <div class="custom-group">
+            <label class="custom-label">
+              <i class="fas fa-calculator"></i> Quantidade
+            </label>
+            <div class="quantity-selector">
+              <button class="qty-btn" onclick="decreaseQuantity()">
+                <i class="fas fa-minus"></i>
+              </button>
+              <input type="number" id="quantity" value="1" min="1" readonly />
+              <button class="qty-btn" onclick="increaseQuantity()">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div class="modal-total">
+            <span>Total:</span>
+            <span class="total-valor" id="modalTotal">R$ 12,00</span>
+          </div>
+          <button class="btn btn-primary btn-large" onclick="addToCart()">
+            <i class="fas fa-shopping-cart"></i> Adicionar ao Carrinho
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carrinho Section -->
+    <section id="carrinho" class="carrinho-section" style="display: none">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">
+            Meu <span class="gradient-text">Carrinho</span>
+          </h2>
+        </div>
+
+        <div class="carrinho-container">
+          <div class="carrinho-items" id="carrinhoItems">
+            <div class="empty-cart">
+              <i class="fas fa-shopping-cart"></i>
+              <h3>Seu carrinho está vazio</h3>
+              <p>Adicione produtos deliciosos ao seu carrinho!</p>
+              <button class="btn btn-primary" onclick="goToProducts()">
+                Ver Produtos
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="carrinho-summary"
+            id="carrinhoSummary"
+            style="display: none"
+          >
+            <h3>Resumo do Pedido</h3>
+            <div class="summary-line">
+              <span>Subtotal</span>
+              <span id="subtotal">R$ 0,00</span>
+            </div>
+            <div class="summary-line">
+              <span>Entrega</span>
+              <span>Grátis</span>
+            </div>
+            <div class="summary-line total">
+              <span>Total</span>
+              <span id="totalGeral">R$ 0,00</span>
+            </div>
+            <button
+              class="btn btn-primary btn-large"
+              onclick="openCheckoutModal()"
+            >
+              <i class="fas fa-check"></i> Finalizar Pedido
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal de Checkout -->
+    <div id="checkoutModal" class="modal">
+      <div class="modal-content modal-large">
+        <button class="modal-close" onclick="closeCheckoutModal()">
+          <i class="fas fa-times"></i>
+        </button>
+
+        <div class="modal-header">
+          <h2>Finalizar Pedido</h2>
+          <p>Preencha seus dados para concluir</p>
+        </div>
+
+        <div class="modal-body">
+          <form id="checkoutForm">
+            <div class="form-group">
+              <label><i class="fas fa-user"></i> Nome Completo</label>
+              <input
+                type="text"
+                id="customerName"
+                required
+                placeholder="Digite seu nome"
+              />
+            </div>
+
+            <div class="form-group">
+              <label><i class="fas fa-phone"></i> Telefone (WhatsApp)</label>
+              <input
+                type="tel"
+                id="customerPhone"
+                required
+                placeholder="(00) 00000-0000"
+                maxlength="15"
+              />
+            </div>
+
+            <div class="form-group">
+              <label
+                ><i class="fas fa-map-marker-alt"></i> Endereço de
+                Entrega</label
+              >
+              <input
+                type="text"
+                id="customerAddress"
+                required
+                placeholder="Rua, número, bairro"
+              />
+            </div>
+
+            <div class="form-group">
+              <label
+                ><i class="fas fa-comment"></i> Observações (opcional)</label
+              >
+              <textarea
+                id="customerNotes"
+                rows="3"
+                placeholder="Alguma observação sobre seu pedido?"
+              ></textarea>
+            </div>
+
+            <div class="checkout-summary">
+              <h3>Resumo do Pedido</h3>
+              <div id="checkoutItems"></div>
+              <div class="checkout-total">
+                <span>Total:</span>
+                <span id="checkoutTotal">R$ 0,00</span>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-large">
+              <i class="fab fa-whatsapp"></i> Enviar Pedido via WhatsApp
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3><i class="fas fa-birthday-cake"></i> Sabor à Vida</h3>
+            <p>Bolos vulcão artesanais que explodem de sabor!</p>
+            <div class="social-links">
+              <a
+                class="instagram"
+                href="https://instagram.com/saboravida.se"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a
+                class="whatsapp"
+                href="https://wa.me/5579998792778?text=Ol%C3%A1%2C%20gostaria%20de%20fazer%20um%20pedido"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <i class="fab fa-whatsapp"></i>
+              </a>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h4>Links Rápidos</h4>
+            <ul>
+              <li><a href="#home">Início</a></li>
+              <li><a href="produtos.html">Produtos</a></li>
+              <li><a href="#sobre">Sobre</a></li>
+              <li><a href="#rastreamento">Rastrear Pedido</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Contato</h4>
+            <ul>
+              <li><i class="fas fa-phone"></i> 79 99879-2778</li>
+              <li><i class="fas fa-envelope"></i> saboraviida@gmail.com</li>
+              <li><i class="fas fa-clock"></i> Seg-Sáb: 8h-20h</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 Sabor à Vida. Todos os direitos reservados.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="js/firebase.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/tracking.js"></script>
+    <!-- christmas.js removido -->
+  </body>
+</html>
