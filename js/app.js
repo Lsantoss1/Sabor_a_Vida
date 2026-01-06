@@ -718,7 +718,7 @@ function saveOrder(order) {
 }
 
 function sendToWhatsApp(order) {
-  const whatsappNumber = "5579981468281"; // Substituir pelo número real
+  const whatsappNumber = "557979998792778"; // Substituir pelo número real
 
   let message = `🍰 *NOVO PEDIDO - SABOR À VIDA* 🍰\n\n`;
   message += `📋 *Pedido:* ${order.id}\n`;
