@@ -13,6 +13,9 @@ import {
   orderBy,
   where,
   updateDoc,
+  serverTimestamp,
+  onSnapshot,
+  runTransaction,
   deleteDoc,
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 import {
@@ -50,7 +53,10 @@ const auth = getAuth(app);
 
 async function saveOrderToFirestore(order) {
   try {
-    await setDoc(doc(db, "orders", order.id), order, { merge: true });
+    const data = Object.assign({}, order);
+    if (!data.createdAt) data.createdAt = serverTimestamp();
+    data.updatedAt = serverTimestamp();
+    await setDoc(doc(db, "orders", order.id), data, { merge: true });
     console.log("Pedido salvo no Firestore:", order.id);
     return true;
   } catch (error) {
@@ -90,13 +96,53 @@ async function getOrdersByPhoneFromFirestore(phone) {
 async function updateOrderStatusInFirestore(orderId, newStatus) {
   try {
     const ref = doc(db, "orders", orderId);
-    await updateDoc(ref, { status: newStatus });
+    await updateDoc(ref, { status: newStatus, updatedAt: serverTimestamp() });
     console.log("Status atualizado:", orderId, newStatus);
-    return true;
+    return { success: true };
   } catch (error) {
     console.error("Erro ao atualizar status:", error);
-    return false;
+    return { success: false, error: error.message || String(error) };
   }
+}
+
+// Gerar ID sequencial usando transação em contador 'counters/orders'
+async function generateOrderIdFirestore() {
+  const counterRef = doc(db, "counters", "orders");
+  try {
+    const seq = await runTransaction(db, async (tx) => {
+      const snap = await tx.get(counterRef);
+      if (!snap.exists()) {
+        tx.set(counterRef, { seq: 1 });
+        return 1;
+      }
+      const current = snap.data().seq || 0;
+      const next = current + 1;
+      tx.update(counterRef, { seq: next });
+      return next;
+    });
+
+    return `SAV${seq.toString().padStart(2, "0")}`;
+  } catch (error) {
+    console.error("Erro ao gerar ID sequencial:", error);
+    throw error;
+  }
+}
+
+// Subscrição em tempo real de pedidos — retorna função de unsubscribe
+function subscribeOrdersRealtime(onChange, onError) {
+  const q = query(collection(db, "orders"), orderBy("data", "desc"));
+  const unsub = onSnapshot(
+    q,
+    (snapshot) => {
+      const orders = snapshot.docs.map((d) => d.data());
+      if (typeof onChange === "function") onChange(orders);
+    },
+    (err) => {
+      console.error("Erro no snapshot de pedidos:", err);
+      if (typeof onError === "function") onError(err);
+    }
+  );
+  return unsub;
 }
 
 async function deleteOrderFromFirestore(orderId) {
@@ -195,6 +241,8 @@ window.FirebaseDB = {
   getAllOrders: getAllOrdersFromFirestore,
   getOrdersByPhone: getOrdersByPhoneFromFirestore,
   updateOrderStatus: updateOrderStatusInFirestore,
+  generateOrderId: generateOrderIdFirestore,
+  subscribeOrders: subscribeOrdersRealtime,
   deleteOrder: deleteOrderFromFirestore,
   loginAdmin,
   logoutAdmin,

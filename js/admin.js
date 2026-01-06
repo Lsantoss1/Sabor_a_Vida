@@ -47,6 +47,59 @@ function showDashboard() {
   initDashboard();
 }
 
+function setupAdminListeners() {
+  const navItems = document.querySelectorAll(".nav-item");
+
+  navItems.forEach((item) => {
+    item.addEventListener("click", (e) => {
+      e.preventDefault();
+      const view = item.getAttribute("data-view");
+      switchView(view);
+    });
+  });
+}
+
+// Utilitário: converte vários formatos de timestamp para ms desde epoch
+function tsToMs(val) {
+  if (!val) return NaN;
+  if (val instanceof Date) return val.getTime();
+  if (typeof val === "string") return Date.parse(val);
+  if (val && typeof val === "object") {
+    if (typeof val.toDate === "function") return val.toDate().getTime();
+    if (val.seconds) return val.seconds * 1000;
+  }
+  return NaN;
+}
+
+// Mescla pedidos remotos com locais escolhendo a versão mais recente por updatedAt/data
+function mergeRemoteWithLocal(remoteOrders) {
+  const localOrders = JSON.parse(
+    localStorage.getItem("saboravidaOrders") || "[]"
+  );
+  const localMap = new Map(localOrders.map((o) => [o.id, o]));
+  const merged = [];
+
+  remoteOrders.forEach((ro) => {
+    const lo = localMap.get(ro.id);
+    if (!lo) {
+      merged.push(ro);
+    } else {
+      const roTime = tsToMs(ro.updatedAt) || tsToMs(ro.data);
+      const loTime = tsToMs(lo.updatedAt) || tsToMs(lo.data);
+      if (!isNaN(roTime) && !isNaN(loTime)) {
+        merged.push(roTime >= loTime ? ro : lo);
+      } else {
+        merged.push(ro);
+      }
+      localMap.delete(ro.id);
+    }
+  });
+
+  // adicionar pedidos locais que não existem no remoto
+  for (const remaining of localMap.values()) merged.push(remaining);
+  return merged;
+}
+
 // ============================================
 // LOGIN
 // ============================================
@@ -89,32 +142,6 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
     showToast("Erro", "Falha ao autenticar", "error");
   }
 });
-
-function logout() {
-  if (confirm("Deseja realmente sair?")) {
-    localStorage.removeItem("adminLoggedIn");
-    AdminState.isLoggedIn = false;
-    showLoginScreen();
-    showToast("Até logo!", "Logout realizado com sucesso", "info");
-  }
-}
-
-// ============================================
-// NAVEGAÇÃO
-// ============================================
-
-function setupAdminListeners() {
-  const navItems = document.querySelectorAll(".nav-item");
-
-  navItems.forEach((item) => {
-    item.addEventListener("click", (e) => {
-      e.preventDefault();
-      const view = item.getAttribute("data-view");
-      switchView(view);
-    });
-  });
-}
-
 function switchView(viewName) {
   // Atualizar nav items
   document.querySelectorAll(".nav-item").forEach((item) => {
@@ -170,10 +197,11 @@ function initDashboard() {
   // Se houver integração Firebase, sincronizar pedidos remotos antes de carregar o dashboard
   if (window.FirebaseDB && FirebaseDB.getAllOrders) {
     FirebaseDB.getAllOrders()
-      .then((orders) => {
-        if (Array.isArray(orders) && orders.length > 0) {
-          localStorage.setItem("saboravidaOrders", JSON.stringify(orders));
-          console.log("Pedidos remotos carregados:", orders.length);
+      .then((remoteOrders) => {
+        if (Array.isArray(remoteOrders) && remoteOrders.length > 0) {
+          const merged = mergeRemoteWithLocal(remoteOrders);
+          localStorage.setItem("saboravidaOrders", JSON.stringify(merged));
+          console.log("Pedidos remotos carregados e mesclados:", merged.length);
         } else {
           console.log(
             "Nenhum pedido remoto retornado — mantendo dados locais."
@@ -187,6 +215,34 @@ function initDashboard() {
         loadDashboardData();
         createCharts();
       });
+    // Também inscrever em atualizações em tempo real para refletir exclusões/alterações feitas diretamente no console
+    if (window.FirebaseDB && FirebaseDB.subscribeOrders) {
+      try {
+        const unsubscribe = FirebaseDB.subscribeOrders((orders) => {
+          try {
+            const merged = mergeRemoteWithLocal(orders);
+            localStorage.setItem("saboravidaOrders", JSON.stringify(merged));
+            loadDashboardData();
+            if (AdminState.currentView === "pedidos")
+              loadPedidos(AdminState.currentFilter);
+            console.log(
+              "Pedidos atualizados (realtime) mesclados:",
+              merged.length
+            );
+          } catch (e) {
+            // fallback: se algo falhar, aplicar os dados remotos brutos
+            console.error("Erro ao mesclar orders realtime:", e);
+            localStorage.setItem("saboravidaOrders", JSON.stringify(orders));
+            loadDashboardData();
+            if (AdminState.currentView === "pedidos")
+              loadPedidos(AdminState.currentFilter);
+          }
+        });
+        AdminState.unsubscribeRealtime = unsubscribe;
+      } catch (err) {
+        console.error("Erro ao subscrever pedidos realtime:", err);
+      }
+    }
     return;
   }
 
@@ -437,6 +493,24 @@ function loadPedidos(filter = "todos") {
                                 ${item.quantidade}x ${
                               item.nome
                             } - ${formatCurrency(item.total)}
+                                <div class="pedido-item-opts" style="font-size:0.95rem; color:var(--gray); margin-top:6px;">
+                                    Massa: ${formatOption(item.massa)}
+                                    &nbsp;|&nbsp; Cobertura: ${formatOption(
+                                      item.cobertura
+                                    )}
+                                    ${
+                                      item.acompanhamento
+                                        ? `&nbsp;|&nbsp; Acompanhamento: ${formatOption(
+                                            item.acompanhamento
+                                          )}`
+                                        : ""
+                                    }
+                                    ${
+                                      item.coberturaExtra
+                                        ? `&nbsp;|&nbsp; Cobertura Extra`
+                                        : ""
+                                    }
+                                </div>
                             </div>
                         `
                           )
@@ -508,22 +582,62 @@ function filterOrders(status) {
   loadPedidos(status);
 }
 
-function updateOrderStatus(orderId, newStatus) {
+async function updateOrderStatus(orderId, newStatus) {
   const orders = JSON.parse(localStorage.getItem("saboravidaOrders") || "[]");
   const order = orders.find((o) => o.id === orderId);
 
-  if (order) {
-    order.status = newStatus;
-    localStorage.setItem("saboravidaOrders", JSON.stringify(orders));
+  if (!order) return;
 
+  // Tentar persistir remotamente quando disponível
+  if (window.FirebaseDB && FirebaseDB.updateOrderStatus) {
+    try {
+      const ok = await FirebaseDB.updateOrderStatus(orderId, newStatus);
+      order.status = newStatus;
+      order.updatedAt = new Date().toISOString();
+      localStorage.setItem("saboravidaOrders", JSON.stringify(orders));
+
+      if (ok) {
+        showToast(
+          "Atualizado!",
+          `Pedido ${orderId} atualizado para: ${getStatusText(newStatus)}`,
+          "success"
+        );
+      } else {
+        showToast(
+          "Atualizado localmente",
+          `Falha ao persistir no servidor. Status atualizado localmente para: ${getStatusText(
+            newStatus
+          )}`,
+          "warning"
+        );
+      }
+    } catch (err) {
+      console.error("Erro ao atualizar status remoto:", err);
+      order.status = newStatus;
+      order.updatedAt = new Date().toISOString();
+      localStorage.setItem("saboravidaOrders", JSON.stringify(orders));
+      showToast(
+        "Atualizado localmente",
+        `Falha ao atualizar remoto. Status atualizado localmente para: ${getStatusText(
+          newStatus
+        )}`,
+        "warning"
+      );
+    }
+  } else {
+    // Só local
+    order.status = newStatus;
+    order.updatedAt = new Date().toISOString();
+    localStorage.setItem("saboravidaOrders", JSON.stringify(orders));
     showToast(
       "Atualizado!",
       `Pedido ${orderId} atualizado para: ${getStatusText(newStatus)}`,
       "success"
     );
-    loadPedidos(AdminState.currentFilter);
-    loadDashboardData();
   }
+
+  loadPedidos(AdminState.currentFilter);
+  loadDashboardData();
 }
 
 function cancelOrder(orderId) {
@@ -592,6 +706,37 @@ function showOrderDetail(orderId) {
 
 function closeOrderModal() {
   document.getElementById("orderDetailModal").classList.remove("active");
+}
+
+// Faz logout do admin: limpa estado local e encerra sessão no Firebase quando disponível
+async function logout() {
+  try {
+    // Se houver inscrição realtime, cancelar
+    if (AdminState.unsubscribeRealtime) {
+      try {
+        AdminState.unsubscribeRealtime();
+      } catch (e) {
+        console.warn("Falha ao cancelar realtime unsubscribe:", e);
+      }
+      AdminState.unsubscribeRealtime = null;
+    }
+
+    if (window.FirebaseDB && FirebaseDB.logoutAdmin) {
+      await FirebaseDB.logoutAdmin();
+    } else if (window.FirebaseDB && FirebaseDB.logout) {
+      // compatibilidade por nome
+      await FirebaseDB.logout();
+    } else {
+      localStorage.removeItem("adminLoggedIn");
+    }
+
+    AdminState.isLoggedIn = false;
+    showLoginScreen();
+    showToast("Sessão encerrada", "Você saiu do painel admin", "info");
+  } catch (err) {
+    console.error("Erro ao efetuar logout:", err);
+    showToast("Erro", "Falha ao encerrar sessão", "error");
+  }
 }
 
 // ============================================
@@ -831,14 +976,46 @@ function exportData() {
   showToast("Exportado!", "Dados exportados com sucesso", "success");
 }
 
-function clearAllOrders() {
-  if (confirm("ATENÇÃO: Isso vai apagar TODOS os pedidos. Tem certeza?")) {
-    if (confirm("Esta ação não pode ser desfeita. Confirma?")) {
+async function clearAllOrders() {
+  if (!confirm("ATENÇÃO: Isso vai apagar TODOS os pedidos. Tem certeza?"))
+    return;
+  if (!confirm("Esta ação não pode ser desfeita. Confirma?")) return;
+
+  const orders = JSON.parse(localStorage.getItem("saboravidaOrders") || "[]");
+
+  // Tentar remover também no Firestore quando possível
+  if (window.FirebaseDB && FirebaseDB.deleteOrder) {
+    try {
+      for (const o of orders) {
+        try {
+          await FirebaseDB.deleteOrder(o.id);
+        } catch (e) {
+          console.warn("Falha ao deletar pedido remoto:", o.id, e);
+        }
+      }
+      // Ao deletar remotamente, a inscrição realtime (se ativa) deverá sincronizar localStorage.
       localStorage.setItem("saboravidaOrders", "[]");
-      showToast("Limpo!", "Todos os pedidos foram removidos", "success");
+      showToast(
+        "Limpo!",
+        "Todos os pedidos foram removidos (remoto e local)",
+        "success"
+      );
       loadViewData(AdminState.currentView);
+      return;
+    } catch (err) {
+      console.error("Erro ao limpar pedidos remotamente:", err);
+      showToast(
+        "Parcial",
+        "Ocorreram erros ao deletar alguns pedidos remotamente",
+        "warning"
+      );
     }
   }
+
+  // Fallback: apenas local
+  localStorage.setItem("saboravidaOrders", "[]");
+  showToast("Limpo!", "Todos os pedidos foram removidos (local)", "success");
+  loadViewData(AdminState.currentView);
 }
 
 function getStatusText(status) {

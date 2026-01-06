@@ -19,3 +19,8 @@ Thumbs.db
 # Backup
 *.bak
 *.backup
+
+# Secrets
+secrets/
+# Service account (moved to secrets/)
+scripts/serviceAccountKey.json

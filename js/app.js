@@ -646,7 +646,7 @@ async function handleCheckout(e) {
   }
 
   // Criar pedido (salva localmente em createOrder)
-  const order = createOrder(name, phone, address, notes);
+  const order = await createOrder(name, phone, address, notes);
 
   // Tentar salvar no Firestore se disponível (não bloqueia envio ao WhatsApp)
   if (window.FirebaseDB && FirebaseDB.saveOrder) {
@@ -678,8 +678,21 @@ async function handleCheckout(e) {
   }, 2000);
 }
 
-function createOrder(name, phone, address, notes) {
-  const orderId = generateOrderId();
+async function createOrder(name, phone, address, notes) {
+  let orderId;
+  try {
+    if (window.FirebaseDB && FirebaseDB.generateOrderId) {
+      orderId = await FirebaseDB.generateOrderId();
+    }
+  } catch (err) {
+    console.warn(
+      "Falha ao obter ID sequencial do servidor, usando fallback:",
+      err
+    );
+  }
+
+  if (!orderId) orderId = "SAV" + Date.now().toString().slice(-8);
+
   const order = {
     id: orderId,
     nome: name,
@@ -696,10 +709,6 @@ function createOrder(name, phone, address, notes) {
   saveOrder(order);
 
   return order;
-}
-
-function generateOrderId() {
-  return "SAV" + Date.now().toString().slice(-8);
 }
 
 function saveOrder(order) {
