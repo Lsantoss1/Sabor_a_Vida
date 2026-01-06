@@ -643,10 +643,78 @@ async function updateOrderStatus(orderId, newStatus) {
 function cancelOrder(orderId) {
   if (confirm("Tem certeza que deseja cancelar este pedido?")) {
     const orders = JSON.parse(localStorage.getItem("saboravidaOrders") || "[]");
+
+    // Preferir deletar no servidor quando disponível para evitar reaparecimento após reload
+    if (window.FirebaseDB && FirebaseDB.deleteOrder) {
+      (async () => {
+        try {
+          const ok = await FirebaseDB.deleteOrder(orderId);
+          const filteredOrders = orders.filter((o) => o.id !== orderId);
+          localStorage.setItem(
+            "saboravidaOrders",
+            JSON.stringify(filteredOrders)
+          );
+          if (ok) {
+            showToast(
+              "Cancelado",
+              "Pedido cancelado e removido (remoto)",
+              "info"
+            );
+          } else {
+            showToast(
+              "Cancelado (local)",
+              "Falha ao remover remotamente. Pedido removido localmente",
+              "warning"
+            );
+          }
+          loadPedidos(AdminState.currentFilter);
+          loadDashboardData();
+        } catch (err) {
+          console.error("Erro ao deletar pedido remoto:", err);
+          // fallback: marcar como cancelado remotamente se possível
+          if (window.FirebaseDB && FirebaseDB.updateOrderStatus) {
+            try {
+              await FirebaseDB.updateOrderStatus(orderId, "cancelado");
+              const filteredOrders = orders.filter((o) => o.id !== orderId);
+              localStorage.setItem(
+                "saboravidaOrders",
+                JSON.stringify(filteredOrders)
+              );
+              showToast(
+                "Cancelado",
+                "Pedido marcado como cancelado (remoto) e removido localmente",
+                "info"
+              );
+              loadPedidos(AdminState.currentFilter);
+              loadDashboardData();
+              return;
+            } catch (e) {
+              console.error("Erro ao marcar cancelado:", e);
+            }
+          }
+
+          // Se tudo falhar, remover apenas localmente (já era o comportamento antigo)
+          const filteredOrders = orders.filter((o) => o.id !== orderId);
+          localStorage.setItem(
+            "saboravidaOrders",
+            JSON.stringify(filteredOrders)
+          );
+          showToast(
+            "Cancelado (local)",
+            "Pedido removido localmente. Falha ao persistir no servidor",
+            "warning"
+          );
+          loadPedidos(AdminState.currentFilter);
+          loadDashboardData();
+        }
+      })();
+      return;
+    }
+
+    // Fallback: apenas local (sem integração com servidor)
     const filteredOrders = orders.filter((o) => o.id !== orderId);
     localStorage.setItem("saboravidaOrders", JSON.stringify(filteredOrders));
-
-    showToast("Cancelado", "Pedido cancelado com sucesso", "info");
+    showToast("Cancelado", "Pedido cancelado com sucesso (local)", "info");
     loadPedidos(AdminState.currentFilter);
     loadDashboardData();
   }
@@ -1025,6 +1093,7 @@ function getStatusText(status) {
     confirmado: "Confirmado",
     preparando: "Em Preparação",
     pronto: "Pronto",
+    cancelado: "Cancelado",
     entregue: "Entregue",
   };
   return texts[status] || status;

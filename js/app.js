@@ -634,6 +634,15 @@ function closeCheckoutModal() {
 
 async function handleCheckout(e) {
   e.preventDefault();
+  // Evitar envios duplicados (cliques repetidos enquanto o WhatsApp abre)
+  if (AppState.isSubmitting) return;
+  AppState.isSubmitting = true;
+
+  const submitBtn =
+    e.target && e.target.querySelector
+      ? e.target.querySelector('button[type="submit"]')
+      : document.querySelector('#checkoutForm button[type="submit"]');
+  if (submitBtn) submitBtn.disabled = true;
 
   const name = document.getElementById("customerName").value.trim();
   const phone = document.getElementById("customerPhone").value.trim();
@@ -642,40 +651,48 @@ async function handleCheckout(e) {
 
   if (!name || !phone || !address) {
     showToast("Atenção", "Preencha todos os campos obrigatórios", "error");
+    if (submitBtn) submitBtn.disabled = false;
+    AppState.isSubmitting = false;
     return;
   }
 
-  // Criar pedido (salva localmente em createOrder)
-  const order = await createOrder(name, phone, address, notes);
+  let order;
+  try {
+    // Criar pedido (salva localmente em createOrder)
+    order = await createOrder(name, phone, address, notes);
 
-  // Tentar salvar no Firestore se disponível (não bloqueia envio ao WhatsApp)
-  if (window.FirebaseDB && FirebaseDB.saveOrder) {
-    try {
-      const saved = await FirebaseDB.saveOrder(order);
-      if (!saved) console.warn("Pedido não salvo remotamente.");
-    } catch (err) {
-      console.error("Erro ao salvar pedido no Firestore:", err);
+    // Tentar salvar no Firestore se disponível (não bloqueia envio ao WhatsApp)
+    if (window.FirebaseDB && FirebaseDB.saveOrder) {
+      try {
+        const saved = await FirebaseDB.saveOrder(order);
+        if (!saved) console.warn("Pedido não salvo remotamente.");
+      } catch (err) {
+        console.error("Erro ao salvar pedido no Firestore:", err);
+      }
     }
+
+    // Enviar para WhatsApp
+    sendToWhatsApp(order);
+
+    // Limpar carrinho
+    AppState.cart = [];
+    saveCart();
+    updateCartBadge();
+
+    // Fechar modal
+    closeCheckoutModal();
+
+    // Mostrar mensagem de sucesso
+    showToast("Pedido Enviado!", "Aguarde confirmação no WhatsApp", "success");
+
+    // Navegar para home
+    setTimeout(() => {
+      navigateToSection("home");
+    }, 2000);
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
+    AppState.isSubmitting = false;
   }
-
-  // Enviar para WhatsApp
-  sendToWhatsApp(order);
-
-  // Limpar carrinho
-  AppState.cart = [];
-  saveCart();
-  updateCartBadge();
-
-  // Fechar modal
-  closeCheckoutModal();
-
-  // Mostrar mensagem de sucesso
-  showToast("Pedido Enviado!", "Aguarde confirmação no WhatsApp", "success");
-
-  // Navegar para home
-  setTimeout(() => {
-    navigateToSection("home");
-  }, 2000);
 }
 
 async function createOrder(name, phone, address, notes) {
@@ -718,7 +735,7 @@ function saveOrder(order) {
 }
 
 function sendToWhatsApp(order) {
-  const whatsappNumber = "557979998792778"; // Substituir pelo número real
+  const whatsappNumber = "5579998792778"; // Substituir pelo número real
 
   let message = `🍰 *NOVO PEDIDO - SABOR À VIDA* 🍰\n\n`;
   message += `📋 *Pedido:* ${order.id}\n`;
