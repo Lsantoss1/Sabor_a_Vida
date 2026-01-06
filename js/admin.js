@@ -499,6 +499,13 @@ function loadPedidos(filter = "todos") {
                                       item.cobertura
                                     )}
                                     ${
+                                      item.recheio
+                                        ? `&nbsp;|&nbsp; Recheio: ${formatOption(
+                                            item.recheio
+                                          )}`
+                                        : ""
+                                    }
+                                    ${
                                       item.acompanhamento
                                         ? `&nbsp;|&nbsp; Acompanhamento: ${formatOption(
                                             item.acompanhamento

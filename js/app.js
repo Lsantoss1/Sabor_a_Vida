@@ -215,6 +215,13 @@ function openCustomizationModal(tamanho, preco) {
   // Setup option buttons
   setupCustomizationButtons();
 
+  // Mostrar/ocultar opções específicas por tamanho
+  const recheioGroup = document.getElementById("recheioGroup");
+  if (recheioGroup) {
+    if (tamanho === "grande") recheioGroup.style.display = "block";
+    else recheioGroup.style.display = "none";
+  }
+
   // Mostrar modal
   modal.classList.add("active");
   document.body.style.overflow = "hidden";
@@ -306,6 +313,25 @@ function setupCustomizationButtons() {
     });
   });
 
+  // Sincronizar opções de recheio com as mesmas opções de cobertura
+  const recheioContainer = document.getElementById("recheioOptions");
+  if (recheioContainer) {
+    // substituir qualquer conteúdo existente pelas opções de cobertura
+    recheioContainer.innerHTML = "";
+    coberturaOptions.forEach((btn) => {
+      const clone = btn.cloneNode(true);
+      recheioContainer.appendChild(clone);
+    });
+    // adicionar listeners nas novas opções
+    const newRecheioOptions =
+      recheioContainer.querySelectorAll(".custom-option");
+    newRecheioOptions.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        selectOption("recheio", btn, newRecheioOptions);
+      });
+    });
+  }
+
   // Acompanhamento
   const acompanhamentoOptions = document.querySelectorAll(
     "#acompanhamentoOptions .custom-option"
@@ -322,6 +348,8 @@ function setupCustomizationButtons() {
     AppState.customization.coberturaExtra = coberturaExtra.checked;
     updateModalTotal();
   });
+
+  // (recheio listeners são configurados ao clonar cobertura acima)
 }
 
 function selectOption(type, button, allButtons) {
@@ -336,6 +364,7 @@ function resetCustomization() {
     massa: null,
     cobertura: null,
     acompanhamento: null,
+    recheio: null,
     coberturaExtra: false,
     quantidade: 1,
   };
@@ -386,13 +415,27 @@ function decreaseQuantity() {
 // ============================================
 
 function addToCart() {
-  const { massa, cobertura, acompanhamento, coberturaExtra, quantidade } =
-    AppState.customization;
+  const {
+    massa,
+    cobertura,
+    acompanhamento,
+    recheio,
+    coberturaExtra,
+    quantidade,
+  } = AppState.customization;
 
   // Validar seleções
   if (!massa || !cobertura || !acompanhamento) {
     showToast("Atenção!", "Por favor, selecione todos os sabores", "error");
     return;
+  }
+
+  // Se for grande, o recheio é obrigatório
+  if (AppState.currentProduct && AppState.currentProduct.tamanho === "grande") {
+    if (!recheio) {
+      showToast("Atenção!", "Selecione um recheio para o bolo grande", "error");
+      return;
+    }
   }
 
   // Criar item do carrinho
@@ -404,6 +447,7 @@ function addToCart() {
     quantidade: quantidade,
     massa: massa,
     cobertura: cobertura,
+    recheio: recheio || null,
     acompanhamento: acompanhamento,
     coberturaExtra: coberturaExtra,
     total:
@@ -505,6 +549,13 @@ function renderCart() {
                     <p class="cart-item-custom">🍨 Cobertura: ${formatOption(
                       item.cobertura
                     )}</p>
+                    ${
+                      item.recheio
+                        ? `<p class="cart-item-custom">🍰 Recheio: ${formatOption(
+                            item.recheio
+                          )}</p>`
+                        : ""
+                    }
                     <p class="cart-item-custom">🍓 Acompanhamento: ${formatOption(
                       item.acompanhamento
                     )}</p>
@@ -611,8 +662,17 @@ function openCheckoutModal() {
   AppState.cart.forEach((item) => {
     itemsHTML += `
             <div class="checkout-item">
-                <span>${item.quantidade}x ${item.nome}</span>
-                <span>${formatCurrency(item.total)}</span>
+                <div style="display:flex; justify-content:space-between; width:100%;">
+                  <span>${item.quantidade}x ${item.nome}</span>
+                  <span>${formatCurrency(item.total)}</span>
+                </div>
+                ${
+                  item.recheio
+                    ? `<div style="font-size:0.95rem; color:var(--gray); margin-top:6px;">Recheio: ${formatOption(
+                        item.recheio
+                      )}</div>`
+                    : ""
+                }
             </div>
         `;
   });
